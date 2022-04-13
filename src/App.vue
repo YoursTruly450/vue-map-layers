@@ -1,23 +1,19 @@
 <template>
-  <div id="app">
-  </div>
+  <map-layer></map-layer>
 </template>
 
 <script>
+import MapLayer from './components/MapLayer.vue';
 
 export default {
+
   name: 'App',
-  components: {}
+  components: {
+    MapLayer
+  }
 }
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+@import '@/assets/scss/main.scss';
 </style>

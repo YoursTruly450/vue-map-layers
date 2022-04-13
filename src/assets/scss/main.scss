@@ -1,0 +1,46 @@
+@mixin font-type($fontSize, $lineHeight, $fontColor, $fontWeight) {
+  font-family: "Helvetica", sans-serif;
+  font-style: normal;
+  font-size: $fontSize;
+  line-height: $lineHeight;
+  color: $fontColor;
+  font-weight: $fontWeight;
+}
+
+html, body {
+  background-color: transparent;
+  @include font-type(18px, 24px, #010101, normal);
+}
+
+html, body, h1, section, nav, input, select, p, a, div, ul, li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  width: 5px;
+  background-color: #023020;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-track {
+  width: 0px;
+  background-color: #000000;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #629727;
+}
