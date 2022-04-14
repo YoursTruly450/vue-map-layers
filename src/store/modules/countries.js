@@ -11,7 +11,7 @@ export default ({
   },
   mutations: {
     updateCountries(state, countries) {
-      state.countries = countries.features;
+      state.countries = countries;
     }
   },
   actions: {
