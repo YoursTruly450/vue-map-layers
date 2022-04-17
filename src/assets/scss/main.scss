@@ -1,11 +1,12 @@
-@mixin font-type($fontSize, $lineHeight, $fontColor, $fontWeight) {
-  font-family: "Helvetica", sans-serif;
+/* roboto-regular - latin_cyrillic */
+@font-face {
+  font-family: 'Roboto';
   font-style: normal;
-  font-size: $fontSize;
-  line-height: $lineHeight;
-  color: $fontColor;
-  font-weight: $fontWeight;
+  font-weight: 400;
+  src: url('~@/assets/fonts/roboto-v29-latin_cyrillic-regular.woff2') format('woff2'); /* Super Modern Browsers */
 }
+
+@import '@/assets/scss/mixin.scss';
 
 html, body {
   background-color: transparent;
@@ -43,4 +44,12 @@ a {
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: #629727;
+}
+
+
+// Main Block
+.main-block {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
 }

@@ -1,8 +1,5 @@
 .map-layer {
-  width: 100%;
+  display: block;
+  width: calc(100% - 446px);
   height: 100vh;
-
-  &__feature:hover {
-    opacity: 0.2;
-  }
 }

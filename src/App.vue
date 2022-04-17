@@ -1,15 +1,15 @@
 <template>
-  <map-layer></map-layer>
+  <main-block />
 </template>
 
 <script>
-import MapLayer from './components/MapLayer.vue';
+import MainBlock from './components/Main.vue';
 
 export default {
 
   name: 'App',
   components: {
-    MapLayer
+    MainBlock
   }
 }
 </script>
