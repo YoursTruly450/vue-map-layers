@@ -9,7 +9,18 @@
   padding: 16px 22px;
 
   &__title {
-    font-weight: 700;
-    @include font-type(16px, 19px, #B83700, normal);
+    @include font-type(16px, 19px, #B83700, 700);
+  }
+
+  &__list {
+    margin-top: 8px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #000000;
+    box-sizing: border-box;
+    padding: 16px;
+    overflow: auto;
   }
 }

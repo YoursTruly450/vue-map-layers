@@ -1,0 +1,22 @@
+@import '@/assets/scss/mixin.scss';
+
+.__mt8 {
+  margin-top: 8px;
+}
+
+.country {
+  display: flex;
+  flex-direction: column;
+  background: rgba(224, 224, 224, 0.58);
+  box-sizing: border-box;
+  padding: 8px;
+  @include font-type(12px, 14px, #B83700, 400);
+
+  &__name {
+    @include font-type(16px, 19px, #B83700, 400);
+  }
+
+  &__cooordinates {
+    @include font-type(14px, 16px, #000000, 400);
+  }
+}

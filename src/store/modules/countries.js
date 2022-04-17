@@ -2,17 +2,24 @@ import axios from 'axios';
 
 export default ({
   state: {
-    countries: []
+    countries: [],
+    selectedCountries: []
   },
   getters: {
     countries(state) {
       return state.countries;
-    }
+    },
+    selectedCountries(state) {
+      return state.selectedCountries;
+    },
   },
   mutations: {
     updateCountries(state, countries) {
       state.countries = countries;
-    }
+    },
+    updateSelectedCountries(state, selectedCountries) {
+      state.selectedCountries = selectedCountries;
+    },
   },
   actions: {
     getCountries(ctx) {
@@ -26,6 +33,10 @@ export default ({
           ctx.commit('updateCountries', countries);
         })
         .catch(error => console.error(error));
+    },
+
+    setSelectedCountries(ctx, {selectedFeatures}) {
+      ctx.commit('updateSelectedCountries', selectedFeatures);
     }
   }
 })

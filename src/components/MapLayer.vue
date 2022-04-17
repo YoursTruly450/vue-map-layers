@@ -1,54 +1,160 @@
 <template>
-  <section class="map-layer">
-    <vl-map :load-tiles-while-animating="true" :load-tiles-while-interacting="true" data-projection="EPSG:4326">
-
-      <vl-layer-tile>
-        <vl-source-osm />
-      </vl-layer-tile>
-
-      <vl-view :zoom.sync="zoom" :center.sync="center" :rotation.sync="rotation"></vl-view>
-
-      <vl-feature v-for="(country, index) in countries.features" :key="index" :properties="{id: country.id, properties: country.properties}">
-        <vl-geom-polygon v-if="country.geometry.type === 'Polygon'" :coordinates="country.geometry.coordinates"></vl-geom-polygon>
-        <vl-geom-multi-polygon v-if="country.geometry.type === 'MultiPolygon'" :coordinates="country.geometry.coordinates"></vl-geom-multi-polygon>
-        <vl-style class="map-layer__feature">
-          <vl-style-fill color="rgba(0, 0, 0, 0.01)"></vl-style-fill>
-          <vl-style-stroke
-            color="red"
-            :width="1">
-          </vl-style-stroke>
-          <vl-style-text :text="country.properties.name"></vl-style-text>
-        </vl-style>
-      </vl-feature>
-
-      <vl-layer-tile id="osm">
-        <vl-source-osm></vl-source-osm>
-      </vl-layer-tile>
-    </vl-map>
-  </section>
+  <div ref="map-root" class="map-layer">
+  </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import * as olExtent from 'ol/extent';
+import View from 'ol/View';
+import Map from 'ol/Map';
+import TileLayer from 'ol/layer/Tile';
+import OSM from 'ol/source/OSM';
+// we’ll need these additional imports
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import GeoJSON from 'ol/format/GeoJSON';
+import {DragBox, Select} from 'ol/interaction';
+import {Fill, Stroke, Style} from 'ol/style';
+import {platformModifierKeyOnly} from 'ol/events/condition';
+
+// importing the OpenLayers stylesheet is required for having
+// good looking buttons!
+import 'ol/ol.css';
+
 export default {
   name: 'MapLayer',
   components: {},
   data() {
     return {
-      zoom: 10,
-      center: [50.153716, 53.212326],
-      rotation: 0,
-      geolocPosition: undefined,
+      features: [],
+      olMap: null,
+      vectorSource: null,
+      selected: null
     }
   },
-  async created() {
+  async mounted() {  
     await this.getCountries();
+    this.createFeatures(); //add fetures from geojson
+    this.createMap();
+    this.addSelectInteraction();
+    this.addDragBoxinteraction();
+    this.addClickInteraction();
   },
   computed: {
     ...mapGetters(['countries']),
   },
   methods: {
-    ...mapActions(['getCountries']),
+    ...mapActions(['getCountries', 'setSelectedCountries']),
+    createFeatures() {
+      this.countries.features.forEach((feature => {
+        this.features.push(
+          new GeoJSON().readFeature(feature, {
+            // this is required since GeoJSON uses latitude/longitude,
+            // but the map is rendered using “Web Mercator”
+            featureProjection: 'EPSG:3857'
+          })
+        )
+      }))
+    },
+    createMap() {
+      // a new vector layer is created with the feature
+      this.vectorSource = new VectorSource({
+        features: this.features,
+      });
+      const vectorLayer = new VectorLayer({
+        source: this.vectorSource
+      });
+
+      //create OpenLayers map
+      this.olMap = new Map({
+        target: this.$refs['map-root'],
+        layers: [
+          //background tiled layer
+          new TileLayer({
+            source: new OSM()
+          }),
+          vectorLayer
+        ],
+        // the map view will initially show the whole world
+        view: new View({
+          zoom: 2,
+          center: [50.153716, 53.212326],
+          constrainResolution: true
+        }),
+      });
+    },
+    addSelectInteraction() {
+      const selectedStyle = new Style({
+        fill: new Fill({
+          color: 'rgba(255, 255, 255, 0.6)',
+        }),
+        stroke: new Stroke({
+          color: 'rgba(255, 255, 255, 0.7)',
+          width: 2,
+        }),
+      });
+
+      // a normal select interaction to handle click
+      const select = new Select({
+        style: function (feature) {
+          const color = feature.get('COLOR_BIO') || '#eeeeee';
+          selectedStyle.getFill().setColor(color);
+          return selectedStyle;
+        },
+      });
+      this.olMap.addInteraction(select);
+      this.selected = select.getFeatures();
+    },
+    addDragBoxinteraction() {
+      // a DragBox interaction used to select features by drawing boxes
+      const dragBox = new DragBox({
+        condition: platformModifierKeyOnly,
+      });
+
+      this.olMap.addInteraction(dragBox);
+
+      dragBox.on('boxstart', () => {
+        this.selected.clear();
+      });
+
+      dragBox.on('boxend', () => {
+        const extent = dragBox.getGeometry().getExtent();
+        const boxFeatures = this.vectorSource
+          .getFeaturesInExtent(extent)
+          .filter((feature) => feature.getGeometry().intersectsExtent(extent)) || [];
+        this.selected.extend(boxFeatures);
+        const features = this.createFeatureArray(boxFeatures);
+        this.setSelectedCountries({selectedFeatures: features});
+      });
+    },
+    addClickInteraction() {
+      this.selected.clear();
+      this.olMap.on('click', (event) => {
+        const selectedFeatures = this.olMap.forEachFeatureAtPixel(event.pixel, (feature) => feature);
+        let features = [];
+        if (selectedFeatures) {
+          features = this.createFeatureArray([selectedFeatures]);
+          this.selected.extend([selectedFeatures]);
+        }
+        this.setSelectedCountries({selectedFeatures: features});
+      })
+    },
+    createFeatureArray(features) {
+      let arr = [];
+      if (features.length > 0) {
+        arr = features.map((feature) => {
+          let obj = {};
+          const extent = feature.getGeometry().transform('EPSG:3857', 'EPSG:4326').getExtent();
+          obj.coordinates = olExtent.getCenter(extent).reverse();
+          obj.name = feature.values_.name;
+          obj.description = '';
+          feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
+          return obj;
+        });
+      }
+      return arr;
+    },
   },
   watch: {},
 }
