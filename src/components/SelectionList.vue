@@ -1,6 +1,6 @@
 <template>
   <div class="selection-list">
-    <p class="selection-list__title">Список элементов попадающие в область видимости</p>
+    <p class="selection-list__title">Список элементов попавших в выделенную область</p>
     <div v-if="selectedCountries.length > 0" class="selection-list__list">
       <CountryDescription 
         v-for="(country, index) in selectedCountries"

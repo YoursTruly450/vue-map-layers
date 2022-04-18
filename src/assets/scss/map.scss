@@ -1,5 +1,22 @@
+@import '@/assets/scss/mixin.scss';
+
 .map-layer {
   display: block;
   width: calc(100% - 446px);
   height: 100vh;
+  @include font-type(12px, 14px, #000000, 400);
+
+  &__overlay {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(196, 196, 196, 0.4);
+    border: 1px solid #B83700;
+    box-sizing: border-box;
+    padding: 6px 12px;
+  }
+
+  &__title {
+    @include font-type(16px, 19px, #B83700, 400);
+  }
 }

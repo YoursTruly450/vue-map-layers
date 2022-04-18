@@ -1,16 +1,17 @@
 @import '@/assets/scss/mixin.scss';
 
-.__mt8 {
-  margin-top: 8px;
-}
-
 .country {
+  margin-top: 14px;
   display: flex;
   flex-direction: column;
   background: rgba(224, 224, 224, 0.58);
   box-sizing: border-box;
   padding: 8px;
   @include font-type(12px, 14px, #B83700, 400);
+
+  &:first-child {
+    margin-top: 0px;
+  }
 
   &__name {
     @include font-type(16px, 19px, #B83700, 400);
