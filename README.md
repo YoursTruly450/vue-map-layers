@@ -1,4 +1,4 @@
-# vue-map-layers
+# vue-open-layers
 
 ## Project setup
 ```
