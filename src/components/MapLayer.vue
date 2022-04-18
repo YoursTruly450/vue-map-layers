@@ -45,7 +45,7 @@ export default {
     ...mapGetters(['countries']),
   },
   methods: {
-    ...mapActions(['getCountries', 'setSelectedCountries']),
+    ...mapActions(['getCountries', 'setSelectedCountries', 'getrandomText']),
     createFeatures() {
       this.countries.features.forEach((feature => {
         this.features.push(
@@ -79,7 +79,7 @@ export default {
         // the map view will initially show the whole world
         view: new View({
           zoom: 2,
-          center: [50.153716, 53.212326],
+          center: [0, 0],
           constrainResolution: true
         }),
       });
@@ -143,13 +143,13 @@ export default {
     createFeatureArray(features) {
       let arr = [];
       if (features.length > 0) {
-        arr = features.map((feature) => {
+        arr = features.map(async (feature) => {
           let obj = {};
-          const extent = feature.getGeometry().transform('EPSG:3857', 'EPSG:4326').getExtent();
-          obj.coordinates = olExtent.getCenter(extent).reverse();
+          const extent = feature.getGeometry().transform('EPSG:3857', 'EPSG:4326').getExtent(); // transform coordinates to geographic
+          obj.coordinates = olExtent.getCenter(extent).reverse(); // lon/lat to lat/lon
           obj.name = feature.values_.name;
-          obj.description = '';
-          feature.getGeometry().transform('EPSG:4326', 'EPSG:3857');
+          obj.description = await this.getrandomText({type: 'sentence', number: 3});
+          feature.getGeometry().transform('EPSG:4326', 'EPSG:3857'); // tranform coordinates to default
           return obj;
         });
       }
