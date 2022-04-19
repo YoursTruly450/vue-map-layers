@@ -1,5 +1,7 @@
 # vue-open-layers
 
+link to deploy: https://i-ready.ru/
+
 ## Project setup
 ```
 npm install
